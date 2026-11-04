@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>السادس الاعدادي 2027</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#14213d;--mu:#667085;--pr:#3b5bdb;--pr2:#e7ecff;--bd:#e2e6ef;--dn:#e03131;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1320;--card:#182036;--tx:#eef1fa;--mu:#9aa5c0;--pr:#7c96ff;--pr2:#222c4d;--bd:#26304d;--dn:#ff6b6b;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Cairo,Tahoma,Arial,sans-serif;line-height:1.6}
+#app{max-width:860px;margin:0 auto;padding:14px 14px 110px}
+header{text-align:center;padding:18px 0 8px}
+.t{font-size:26px;font-weight:800;color:var(--pr)}
+.cr{color:var(--mu);margin-top:6px;font-weight:700}
+.bk{margin-top:8px;background:var(--pr2);color:var(--pr);border:0;border-radius:10px;padding:6px 14px;font:inherit;font-weight:700;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px}
+.card{position:relative;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:20px 10px;text-align:center;cursor:pointer;font-weight:700}
+.card:active{transform:scale(.97)}
+.card .ic{font-size:34px;display:block}
+.card small{display:block;color:var(--mu);font-weight:400}
+.ctl{position:absolute;top:6px;left:6px;display:flex;gap:4px}
+.ctl b{background:var(--pr2);border-radius:8px;padding:0 7px;font-size:13px;cursor:pointer}
+.ctl b.x{color:var(--dn)}
+.item{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-top:14px}
+.item h3{margin:0 0 4px}
+.item p{margin:4px 0 8px;white-space:pre-wrap;color:var(--mu)}
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.imgs img{width:100%;border-radius:10px;cursor:zoom-in;display:block;border:1px solid var(--bd)}
+.empty{text-align:center;color:var(--mu);margin-top:40px}
+button.b,.add{background:var(--pr);color:#fff;border:0;border-radius:12px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
+.add{margin-top:16px;width:100%;background:var(--pr2);color:var(--pr);border:2px dashed var(--pr)}
+.hint{background:var(--pr2);color:var(--pr);border-radius:12px;padding:8px 12px;margin-top:12px;font-size:14px;text-align:center}
+#bar{position:fixed;inset:auto 0 0 0;display:flex;gap:8px;justify-content:center;padding:10px;background:linear-gradient(transparent,var(--bg) 40%)}
+#bar button{box-shadow:0 4px 14px #0003}
+#bar .pub{background:#2f9e44}
+#bar .lock{background:transparent;color:var(--mu);box-shadow:none;padding:4px 10px;opacity:.5}
+.ov{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
+.md{background:var(--card);border-radius:18px;padding:18px;width:100%;max-width:460px;max-height:90%;overflow:auto}
+.md h4{margin:0 0 10px;font-size:18px}
+.md input,.md textarea{width:100%;margin-bottom:8px;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit}
+.md .row{display:flex;gap:8px;margin-top:8px}
+.md .row button{flex:1}
+.md .row .no{background:var(--pr2);color:var(--pr)}
+.th{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.th span{position:relative}
+.th img{width:70px;height:70px;object-fit:cover;border-radius:8px}
+.th i{position:absolute;top:-4px;left:-4px;background:var(--dn);color:#fff;border-radius:50%;width:20px;height:20px;text-align:center;font-style:normal;cursor:pointer;font-size:13px;line-height:20px}
+.lb img{max-width:100%;max-height:100%;border-radius:10px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<div id="bar"></div>
+<script>
+// ====== ضع بيانات مشروعك من Supabase هنا (Project Settings > API) ======
+const SUPABASE_URL='PUT_YOUR_PROJECT_URL';
+const SUPABASE_KEY='PUT_YOUR_ANON_PUBLIC_KEY';
+// ======================================================================
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=s=>document.querySelector(s);
+let D={"subjects":[{"id":"ar","name":"عربي","ic":"📖"},{"id":"en","name":"انكليزي","ic":"🔤"},{"id":"ma","name":"رياضيات","ic":"📐"},{"id":"bi","name":"أحياء","ic":"🧬"},{"id":"ph","name":"فيزياء","ic":"⚛️"},{"id":"is","name":"إسلامية","ic":"🕌"},{"id":"fr","name":"فرنسي","ic":"🇫🇷"}],"sections":[{"id":"ex","name":"الامتحانات","ic":"📝","cats":[{"id":"d","name":"يومية","ic":"📅"},{"id":"c","name":"تراكمية","ic":"📈"}]},{"id":"fn","name":"نوب الفاينلات","ic":"🎯","cats":[]},{"id":"sm","name":"الملخصات","ic":"📚","cats":[]}],"items":[]};
+let V={sec:null,cat:null,sub:null},admin=false,canEdit=false,dirty=false;
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cur=()=>{const s=D.sections.find(x=>x.id===V.sec);return{s,c:s&&s.cats.find(x=>x.id===V.cat),b:D.subjects.find(x=>x.id===V.sub)}};
+const inView=()=>D.items.filter(i=>i.sec===V.sec&&i.cat===(V.cat||'')&&i.sub===V.sub).sort((a,b)=>b.t-a.t);
+
+function grid(list,k,noun,counts){
+  return `<div class="grid">${list.map(o=>`<div class="card" data-a="go" data-k="${k}" data-i="${o.id}"><span class="ic">${esc(o.ic)}</span>${esc(o.name)}${counts?`<small>${counts(o)} عنصر</small>`:''}${admin?`<div class="ctl"><b data-a="ed" data-k="${k}" data-i="${o.id}">✎</b><b class="x" data-a="del" data-k="${k}" data-i="${o.id}">✕</b></div>`:''}</div>`).join('')}</div>${admin?`<button class="add" data-a="add" data-k="${k}">+ ${noun} جديد</button>`:''}`;
+}
+function render(){
+  const{s,c,b}=cur();
+  const crumbs=[s&&s.name,c&&c.name,b&&b.name].filter(Boolean).join(' › ');
+  let h=`<header><div class="t">📘 السادس الاعدادي 2027</div>${V.sec?`<button class="bk" data-a="back">→ رجوع</button><div class="cr">${esc(crumbs)}</div>`:''}</header>`;
+  if(admin)h+=`<div class="hint">وضع التحكم: التغييرات ما تظهر للطلاب إلا بعد ضغط «نشر للجميع»</div>`;
+  if(!s)h+=grid(D.sections,'sec','قسم');
+  else if(s.cats.length&&!V.cat)h+=grid(s.cats,'cat','فئة');
+  else if(!V.sub)h+=grid(D.subjects,'sub','مادة',o=>D.items.filter(i=>i.sec===V.sec&&i.cat===(V.cat||'')&&i.sub===o.id).length);
+  else{
+    const L=inView();
+    if(admin)h+=`<button class="add" data-a="add" data-k="item">+ إضافة محتوى</button>`;
+    h+=L.length?L.map(i=>`<div class="item"><h3>${esc(i.title)}</h3>${i.note?`<p>${esc(i.note)}</p>`:''}<div class="imgs">${i.imgs.map(u=>`<img src="${esc(u)}" loading="lazy" data-a="zoom" alt="">`).join('')}</div>${admin?`<div style="display:flex;gap:8px;margin-top:10px"><button class="b" data-a="ed" data-k="item" data-i="${i.id}">تعديل</button><button class="b" style="background:var(--dn)" data-a="del" data-k="item" data-i="${i.id}">حذف</button></div>`:''}</div>`).join(''):`<div class="empty">لا يوجد محتوى بعد</div>`;
+  }
+  $('#app').innerHTML=h;
+  $('#bar').innerHTML=canEdit?`<button class="b" data-a="adm">${admin?'👁 خروج من التحكم':'⚙️ لوحة التحكم'}</button>${admin&&dirty?'<button class="b pub" data-a="pub">🚀 نشر للجميع</button>':''}<button class="b lock" data-a="out">خروج</button>`:`<button class="b lock" data-a="login">🔒</button>`;
+}
+function mod(title,body,ok){
+  const o=document.createElement('div');o.className='ov';
+  o.innerHTML=`<div class="md"><h4>${title}</h4>${body}<div class="row"><button class="b" id="mok">حفظ</button><button class="b no" id="mno">إلغاء</button></div></div>`;
+  document.body.append(o);
+  $('#mno').onclick=()=>o.remove();
+  $('#mok').onclick=async()=>{const r=await ok();if(r===false)return;o.remove();if(r!=='x')dirty=true;render()};
+}
+function nameM(list,o,title){
+  mod(title,`<input id="m1" placeholder="الاسم" value="${esc(o?o.name:'')}"><input id="m2" placeholder="ايموجي (اختياري)" value="${esc(o?o.ic:'')}">`,()=>{
+    const n=$('#m1').value.trim();if(!n)return false;
+    if(o){o.name=n;o.ic=$('#m2').value.trim()||o.ic}else list.push({id:uid(),name:n,ic:$('#m2').value.trim()||'📌',cats:[]});
+  });
+}
+function itemM(it){
+  const nw=!it;
+  it=it?{...it,imgs:[...it.imgs]}:{id:uid(),sec:V.sec,cat:V.cat||'',sub:V.sub,title:'',note:'',imgs:[],t:Date.now()};
+  const th=()=>$('#th').innerHTML=it.imgs.map((u,n)=>`<span><img src="${esc(u)}" alt=""><i data-n="${n}">×</i></span>`).join('');
+  mod(nw?'إضافة محتوى':'تعديل المحتوى',`<input id="m1" placeholder="العنوان (مثلاً: امتحان الشهر الأول)" value="${esc(it.title)}"><textarea id="m2" rows="3" placeholder="وصف أو نص (اختياري)">${esc(it.note)}</textarea><div class="th" id="th"></div><input id="mf" type="file" accept="image/*" multiple><div id="st" class="cr"></div>`,()=>{
+    if($('#st').textContent)return false;
+    it.title=$('#m1').value.trim();it.note=$('#m2').value.trim();
+    if(!it.title&&!it.imgs.length)return false;
+    if(nw)D.items.push(it);else Object.assign(D.items.find(x=>x.id===it.id),it);
+  });
+  th();
+  $('#th').onclick=e=>{const n=e.target.dataset.n;if(n!=null){it.imgs.splice(+n,1);th()}};
+  $('#mf').onchange=async e=>{
+    for(const f of e.target.files){
+      $('#st').textContent='جاري رفع الصور…';
+      const p=Date.now()+'-'+uid()+'.'+(f.name.split('.').pop()||'jpg').toLowerCase();
+      const{error}=await sb.storage.from('images').upload(p,f,{contentType:f.type});
+      if(error)alert('فشل رفع صورة: '+error.message);
+      else{it.imgs.push(sb.storage.from('images').getPublicUrl(p).data.publicUrl);th()}
+    }
+    $('#st').textContent='';e.target.value='';
+  };
+}
+function loginM(){
+  mod('دخول الأدمن',`<input id="m1" type="email" placeholder="الايميل" dir="ltr"><input id="m2" type="password" placeholder="الباسورد" dir="ltr">`,async()=>{
+    const{error}=await sb.auth.signInWithPassword({email:$('#m1').value.trim(),password:$('#m2').value});
+    if(error){alert('بيانات الدخول غلط');return false}
+    canEdit=true;return 'x';
+  });
+}
+const listOf=k=>k==='sec'?D.sections:k==='sub'?D.subjects:cur().s.cats;
+$('#app').addEventListener('click',e=>{
+  const t=e.target.closest('[data-a]');if(!t)return;
+  const{a,k,i}=t.dataset;
+  if(a==='go'&&!e.target.closest('.ctl')){if(k==='sec')V={sec:i,cat:null,sub:null};else if(k==='cat')V.cat=i;else V.sub=i;render();scrollTo(0,0)}
+  else if(a==='back'){if(V.sub)V.sub=null;else if(V.cat)V.cat=null;else V.sec=null;render()}
+  else if(a==='zoom'){const o=document.createElement('div');o.className='ov lb';o.innerHTML=`<img src="${t.src}" alt="">`;o.onclick=()=>o.remove();document.body.append(o)}
+  else if(!canEdit)return;
+  else if(a==='add')k==='item'?itemM():nameM(listOf(k),null,'إضافة');
+  else if(a==='ed')k==='item'?itemM(D.items.find(x=>x.id===i)):nameM(listOf(k),listOf(k).find(x=>x.id===i),'تعديل');
+  else if(a==='del'&&confirm('متأكد من الحذف؟')){
+    if(k==='item')D.items=D.items.filter(x=>x.id!==i);
+    else{const L=listOf(k);L.splice(L.findIndex(x=>x.id===i),1);D.items=D.items.filter(x=>x[k]!==i)}
+    dirty=true;render();
+  }
+});
+$('#bar').addEventListener('click',async e=>{
+  const a=e.target.dataset.a;
+  if(a==='login')loginM();
+  if(a==='adm'){admin=!admin;render()}
+  if(a==='out'){await sb.auth.signOut();canEdit=admin=dirty=false;load()}
+  if(a==='pub'){
+    e.target.textContent='جاري النشر…';
+    const{error}=await sb.from('site_data').upsert({id:1,data:D});
+    if(error)alert('فشل النشر: '+error.message);else dirty=false;
+    render();
+  }
+});
+async function load(){
+  try{const{data}=await sb.from('site_data').select('data').eq('id',1).maybeSingle();if(data&&data.data)D=data.data}catch(e){}
+  render();
+}
+render();
+(async()=>{
+  try{const{data}=await sb.auth.getSession();canEdit=!!data.session}catch(e){}
+  load();
+})();
+</script>
+</body>
+</html>
